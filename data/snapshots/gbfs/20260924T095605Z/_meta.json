@@ -1,0 +1,24 @@
+{
+  "fetched_at": "2026-09-24T09:56:05+00:00",
+  "feeds": {
+    "system_information": {
+      "url": "https://gbfs.lyft.com/gbfs/2.3/chi/en/system_information.json",
+      "last_updated": 1790243705,
+      "ttl": 60,
+      "bytes": 289
+    },
+    "station_information": {
+      "url": "https://gbfs.lyft.com/gbfs/2.3/chi/en/station_information.json",
+      "last_updated": 1790243706,
+      "ttl": 60,
+      "bytes": 675296
+    },
+    "station_status": {
+      "url": "https://gbfs.lyft.com/gbfs/2.3/chi/en/station_status.json",
+      "last_updated": 1790243708,
+      "ttl": 60,
+      "bytes": 866917
+    }
+  },
+  "station_count": 2059
+}
