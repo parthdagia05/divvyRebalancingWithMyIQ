@@ -10,7 +10,7 @@ stateDiagram-v2
     [*] --> Docked
     Docked --> InRide: undock (rider)
     InRide --> Docked: dock at a station
-    InRide --> Parked: e-bike locked off-dock<br/>(public rack / free-floating)
+    InRide --> Parked: e-bike locked off-dock (rack or free-floating)
     Parked --> InRide: undock (rider)
     InRide --> Missing: never returned
     Docked --> InTruck: rebalancing pickup (operator)
