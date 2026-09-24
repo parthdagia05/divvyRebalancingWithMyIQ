@@ -1,0 +1,35 @@
+{
+  "2026-06": {
+    "bytes": 28468364,
+    "csv_file": "202606-divvy-tripdata.csv",
+    "csv_rows": 762550,
+    "etag": "8eb6ef6b785866bc5d41a6094201a2dc-2",
+    "month": "2026-06",
+    "retrieved_at": "2026-09-24T10:09:11+00:00",
+    "sha256": "34bde1eddacef591664fa97495460fe33265078f4134f8b80f141f94d126cc01",
+    "url": "https://divvy-tripdata.s3.amazonaws.com/202606-divvy-tripdata.zip",
+    "zip_file": "202606-divvy-tripdata.zip"
+  },
+  "2026-07": {
+    "bytes": 32910286,
+    "csv_file": "202607-divvy-tripdata.csv",
+    "csv_rows": 869051,
+    "etag": "cd991325ebcb9e7b83dfe320537a8ead-2",
+    "month": "2026-07",
+    "retrieved_at": "2026-09-24T10:09:12+00:00",
+    "sha256": "4e6bc8725a92f5e4cebb9b3592874b1cea85111f920f9db9cd607cf88ec1fd14",
+    "url": "https://divvy-tripdata.s3.amazonaws.com/202607-divvy-tripdata.zip",
+    "zip_file": "202607-divvy-tripdata.zip"
+  },
+  "2026-08": {
+    "bytes": 32611393,
+    "csv_file": "202608-divvy-tripdata.csv",
+    "csv_rows": 868191,
+    "etag": "621eabfa67e82043ea9c6957a072425e-2",
+    "month": "2026-08",
+    "retrieved_at": "2026-09-24T10:00:35+00:00",
+    "sha256": "3f4de338ee56b1bee76ea310a42f790a2e88e062c3635638cd382582615b827f",
+    "url": "https://divvy-tripdata.s3.amazonaws.com/202608-divvy-tripdata.zip",
+    "zip_file": "202608-divvy-tripdata.zip"
+  }
+}
