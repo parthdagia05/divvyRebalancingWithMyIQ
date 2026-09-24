@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "divvy-rebalancing"
+version = "0.1.0"
+description = "Dependable pipeline from Divvy trip history + GBFS to station rebalancing metrics"
+requires-python = ">=3.10"
+dependencies = ["duckdb>=1.1", "pandas>=2.2", "requests>=2.32", "pyyaml>=6.0", "tabulate>=0.9"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

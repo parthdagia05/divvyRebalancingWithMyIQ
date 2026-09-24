@@ -16,3 +16,8 @@ warehouse/
 logs/*.log
 
 .DS_Store
+
+# Pipeline lock and output staging
+.pipeline.lock
+.outputs.staging/
+*.egg-info/
