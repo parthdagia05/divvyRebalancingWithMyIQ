@@ -1,0 +1,180 @@
+{
+  "run_id": "20260924T100910Z",
+  "months": [
+    "2026-06",
+    "2026-07",
+    "2026-08"
+  ],
+  "status": "success",
+  "started_at": "2026-09-24T10:09:10+00:00",
+  "step_seconds": {
+    "ingest": 2.87,
+    "load": 4.28,
+    "validate": 3.35,
+    "model": 2.96,
+    "metrics": 0.11
+  },
+  "inputs": {
+    "trips": [
+      {
+        "month": "2026-06",
+        "url": "https://divvy-tripdata.s3.amazonaws.com/202606-divvy-tripdata.zip",
+        "zip_file": "202606-divvy-tripdata.zip",
+        "csv_file": "202606-divvy-tripdata.csv",
+        "bytes": 28468364,
+        "etag": "8eb6ef6b785866bc5d41a6094201a2dc-2",
+        "sha256": "34bde1eddacef591664fa97495460fe33265078f4134f8b80f141f94d126cc01",
+        "csv_rows": 762550,
+        "retrieved_at": "2026-09-24T10:09:11+00:00"
+      },
+      {
+        "month": "2026-07",
+        "url": "https://divvy-tripdata.s3.amazonaws.com/202607-divvy-tripdata.zip",
+        "zip_file": "202607-divvy-tripdata.zip",
+        "csv_file": "202607-divvy-tripdata.csv",
+        "bytes": 32910286,
+        "etag": "cd991325ebcb9e7b83dfe320537a8ead-2",
+        "sha256": "4e6bc8725a92f5e4cebb9b3592874b1cea85111f920f9db9cd607cf88ec1fd14",
+        "csv_rows": 869051,
+        "retrieved_at": "2026-09-24T10:09:12+00:00"
+      },
+      {
+        "bytes": 32611393,
+        "csv_file": "202608-divvy-tripdata.csv",
+        "csv_rows": 868191,
+        "etag": "621eabfa67e82043ea9c6957a072425e-2",
+        "month": "2026-08",
+        "retrieved_at": "2026-09-24T10:00:35+00:00",
+        "sha256": "3f4de338ee56b1bee76ea310a42f790a2e88e062c3635638cd382582615b827f",
+        "url": "https://divvy-tripdata.s3.amazonaws.com/202608-divvy-tripdata.zip",
+        "zip_file": "202608-divvy-tripdata.zip"
+      }
+    ],
+    "gbfs_snapshots": [
+      "20260924T095605Z",
+      "20260924T095619Z",
+      "20260924T100620Z"
+    ]
+  },
+  "validation": {
+    "V01": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "V02": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "V03": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "V04:2026-06": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "V04:2026-07": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "V04:2026-08": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "V05": {
+      "passed": true,
+      "rows": 11173,
+      "pct": 0.588
+    },
+    "R01": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "F01": {
+      "passed": true,
+      "rows": 63490,
+      "pct": 2.54
+    },
+    "F02": {
+      "passed": true,
+      "rows": 2129,
+      "pct": 0.085
+    },
+    "F03": {
+      "passed": true,
+      "rows": 2182,
+      "pct": 0.087
+    },
+    "F04": {
+      "passed": true,
+      "rows": 19,
+      "pct": 0.001
+    },
+    "F05": {
+      "passed": true,
+      "rows": 20,
+      "pct": 0.001
+    },
+    "F06": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "F07": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "F08": {
+      "passed": true,
+      "rows": 537293,
+      "pct": 21.494
+    },
+    "F09": {
+      "passed": true,
+      "rows": 558641,
+      "pct": 22.347
+    },
+    "F10": {
+      "passed": true,
+      "rows": 17,
+      "pct": 0.984
+    },
+    "G01": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "G02": {
+      "passed": true,
+      "rows": 0,
+      "pct": 0.0
+    },
+    "G03": {
+      "passed": true,
+      "rows": 18,
+      "pct": 0.291
+    },
+    "G04": {
+      "passed": true,
+      "rows": 30,
+      "pct": 0.861
+    }
+  },
+  "finished_at": "2026-09-24T10:09:24+00:00",
+  "outputs": {
+    "metrics_summary.csv": 20,
+    "rebalancing_targets.csv": 50,
+    "corroboration_gbfs.csv": 2,
+    "hourly_profile.csv": 72,
+    "daily_kpi.csv": 91,
+    "validation_report.csv": 22
+  }
+}

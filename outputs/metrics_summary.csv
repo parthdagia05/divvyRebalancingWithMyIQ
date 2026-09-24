@@ -1,0 +1,21 @@
+metric_id,metric,unit,month,value,definition
+M1,Rebalance-required station-day rate,%,2026-06,1.49,Share of active docking-station-days whose intraday swing exceeded dock capacity
+M1,Rebalance-required station-day rate,%,2026-07,1.78,Share of active docking-station-days whose intraday swing exceeded dock capacity
+M1,Rebalance-required station-day rate,%,2026-08,1.66,Share of active docking-station-days whose intraday swing exceeded dock capacity
+M1,Rebalance-required station-day rate,%,ALL,1.64,Share of active docking-station-days whose intraday swing exceeded dock capacity
+M2,Minimum bike moves per day,bikes/day,2026-06,114.7,"Sum over station-days of (swing - capacity), divided by operational days (lower bound)"
+M2,Minimum bike moves per day,bikes/day,2026-07,129.42,"Sum over station-days of (swing - capacity), divided by operational days (lower bound)"
+M2,Minimum bike moves per day,bikes/day,2026-08,100.23,"Sum over station-days of (swing - capacity), divided by operational days (lower bound)"
+M2,Minimum bike moves per day,bikes/day,ALL,114.95,"Sum over station-days of (swing - capacity), divided by operational days (lower bound)"
+M3,Top-50 station share of required moves,%,2026-06,97.47,Share of all required moves at the 50 stations with the most required moves
+M3,Top-50 station share of required moves,%,2026-07,94.92,Share of all required moves at the 50 stations with the most required moves
+M3,Top-50 station share of required moves,%,2026-08,92.45,Share of all required moves at the 50 stations with the most required moves
+M3,Top-50 station share of required moves,%,ALL,93.24,Share of all required moves at the 50 stations with the most required moves
+M4,Chronic imbalance stations,stations,2026-06,7.0,Docking stations needing rebalancing on >= 50% of their active days (min 10 days)
+M4,Chronic imbalance stations,stations,2026-07,7.0,Docking stations needing rebalancing on >= 50% of their active days (min 10 days)
+M4,Chronic imbalance stations,stations,2026-08,5.0,Docking stations needing rebalancing on >= 50% of their active days (min 10 days)
+M4,Chronic imbalance stations,stations,ALL,6.0,Docking stations needing rebalancing on >= 50% of their active days (min 10 days)
+M5,Dock-attributed ride coverage,%,2026-06,63.33,Share of rides that start AND end at an in-scope docking station
+M5,Dock-attributed ride coverage,%,2026-07,61.41,Share of rides that start AND end at an in-scope docking station
+M5,Dock-attributed ride coverage,%,2026-08,60.4,Share of rides that start AND end at an in-scope docking station
+M5,Dock-attributed ride coverage,%,ALL,61.65,Share of rides that start AND end at an in-scope docking station

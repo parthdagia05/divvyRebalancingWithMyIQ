@@ -1,0 +1,23 @@
+rule_id,severity,description,rows_affected,denominator,pct,passed,action
+F01,FLAG,Ride shorter than 60s (Divvy says these are removed; they are not),63490,2499792,2.5398,True,exclude from flows: same-dock re-docks / false starts
+F02,FLAG,Ride longer than 24h,2129,2499792,0.0852,True,keep departure; arrival kept but counted (likely recovered bike)
+F03,FLAG,No end station and no end coordinates,2182,2499792,0.0873,True,"departure counts, no arrival (lost/stolen or unreconciled)"
+F04,FLAG,Starts or ends at an operator facility,19,2499792,0.0008,True,exclude from flows: not customer demand
+F05,FLAG,Coordinates outside Chicago service area,20,2499792,0.0008,True,"keep, counted"
+F06,FLAG,rideable_type outside known domain,0,2499792,0.0,True,"keep, counted"
+F07,FLAG,member_casual outside known domain,0,2499792,0.0,True,"keep, counted"
+F08,FLAG,No start station (dockless e-bike undock),537293,2499792,21.4935,True,outside station-balance scope; reported as coverage metric M5
+F09,FLAG,No end station (dockless e-bike park),558641,2499792,22.3475,True,outside station-balance scope; reported as coverage metric M5
+F10,FLAG,Station id appears under more than one name,17,1727,0.9844,True,identify stations by id only; canonical name from GBFS
+G01,BLOCK,GBFS short_name unique,0,2059,0.0,True,stop: the join key would fan out
+G02,FLAG,Docking station with capacity <= 0,0,2059,0.0,True,excluded from capacity KPI
+G03,FLAG,Status bikes+docks exceed stated capacity,18,6177,0.2914,True,capacity treated as approximate (assumption A2)
+G04,FLAG,Docking station status not reported for over 1h,30,3486,0.8606,True,excluded from observed empty/full rate
+R01,REJECT,ended_at >= started_at,0,2499792,0.0,True,quarantine row
+V01,BLOCK,Timestamps parse,0,2499792,0.0,True,stop run if exceeded
+V02,BLOCK,ride_id unique across loaded months,0,2499792,0.0,True,"keep first occurrence, quarantine rest; stop if exceeded"
+V03,BLOCK,Each file only holds rides that END in its month,0,2499792,0.0,True,stop: our partition assumption would be wrong
+V04:2026-06,BLOCK,Every day of 2026-06 has rides,0,30,0.0,True,stop: a missing day means an incomplete export
+V04:2026-07,BLOCK,Every day of 2026-07 has rides,0,31,0.0,True,stop: a missing day means an incomplete export
+V04:2026-08,BLOCK,Every day of 2026-08 has rides,0,31,0.0,True,stop: a missing day means an incomplete export
+V05,BLOCK,Dock-named trip stations resolve to a GBFS short_name,11173,1901203,0.5877,True,stop: capacity join would silently drop demand
