@@ -172,3 +172,4 @@ To add a new month, edit `months` in [config/pipeline.yaml](config/pipeline.yaml
 | [docs/05_known_unknowns.md](docs/05_known_unknowns.md) | Full Known / Unknown / Assumption / Limitation list |
 | [notebooks/walkthrough.ipynb](notebooks/walkthrough.ipynb) | Step by step evidence with charts |
 | [src/divvy/](src/divvy/) and [sql/](sql/) | The pipeline code and model SQL |
+| [flasheats-challenges/](flasheats-challenges/) | Separate: FlashEats in-class challenges for Classes 5, 6 and 7 |
