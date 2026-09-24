@@ -38,3 +38,19 @@ validation:
   max_pct_file_month_mismatch: 1.0
   min_days_with_rides_pct: 100.0
   min_gbfs_docking_join_pct: 90.0
+
+model:
+  # The operational day starts at 04:00 local, the lowest-demand hour and the
+  # point from which overnight rebalancing crews reset stations. Events between
+  # 00:00 and 03:59 belong to the previous operational day.
+  op_day_start_hour: 4
+  am_peak_hours: [6, 7, 8, 9]
+  pm_peak_hours: [15, 16, 17, 18]
+
+metrics:
+  # A station is "chronic" if it needs rebalancing on at least this share of its active days.
+  chronic_min_share_of_days: 0.5
+  # Concentration: share of required moves covered by this many top stations.
+  concentration_top_n: 50
+  # Rows written to outputs/rebalancing_targets.csv
+  target_list_size: 50
