@@ -1,0 +1,18 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Raw trip archives are large (~30MB/month) and re-downloadable from the
+# public Divvy bucket. We commit their manifest (checksums, sizes, row counts)
+# instead, so a rerun can prove it received byte-identical inputs.
+data/raw/**/*.zip
+data/raw/**/*.csv
+
+# Local warehouse and run logs are rebuilt by every pipeline run.
+warehouse/
+logs/*.log
+
+.DS_Store
