@@ -1,181 +1,174 @@
-# Divvy Station Rebalancing: from client data to a dependable KPI pipeline
+# Divvy Station Rebalancing Pipeline
 
-**FDE Data Foundations project, Track C.** Chicago's Divvy bike share, built from
-two public operator systems into one repeatable pipeline that tells the operations
-team **where and when stations break, how much truck work that implies, and
-whether a fixed route could cover it.**
-
-```bash
-python -m divvy run        # raw inputs → validated → modelled → metrics, in about 15 seconds
-```
-
----
+FDE Data Foundations project (Track C). Chicago's Divvy bike share data, turned into a
+repeatable pipeline that tells the operations team which stations break, when, and how
+much truck work that needs.
 
 ## 1. Problem
 
-Riders hit two failures: **no bike** at the start of a trip and **no dock** at the
-end. Divvy moves bikes with trucks and valets, but it has no shared, trustworthy
-measure of *how often stations fail by themselves* or *where the moving effort
-should go*. The data exists, but it is split across a monthly trip export and a
-real-time feed, and the two use different station ids.
+Riders hit two failures: **no bike** to take, or **no dock** to return to. Divvy moves
+bikes with trucks, but it has no trusted number for how often stations fail on their own,
+or where the trucks should go.
 
-## 2. Users and stakeholders
+**Users:** the Divvy Operations manager (main user), truck dispatch leads, and station planning.
 
-| Who | What they need from this |
-|---|---|
-| **Divvy Operations manager** (primary) | A monthly KPI, plus a ranked list of stations to put on fixed rebalancing routes |
-| Field dispatch leads | For each target station: fill or drain, the worst hour, and required moves per day |
-| Station planning | Chronic stations where adding docks or a valet corral beats trucking |
-| Data / BI team | A reproducible, audited pipeline they can schedule monthly |
+## 2. KPI
 
-## 3. Project KPI
+**Rebalance-required station-day rate:** the share of days on which a docking station
+could not have survived without a truck.
 
-> **M1: Rebalance-required station-day rate.** The share of active
-> docking-station-days on which the station's intraday **swing** (the peak bikes
-> gained minus the deepest bikes lost since 04:00) exceeded its **dock capacity**.
+How we decide that: through the day we track the station's running total of
+(bikes arrived minus bikes left). If the gap between the highest and lowest point
+(the **swing**) is bigger than the number of docks, then no starting stock of bikes
+could have kept the station working. So a truck *must* have come, or riders were turned away.
 
-On those days no starting stock level could have kept the station both
-rentable and returnable, so an intervention *must* have happened, or riders
-were turned away. [Why swing and not net flow →](docs/04_data_model.md#why-swing-and-not-net-flow)
+> Example: an 11-dock station loses 15 bikes by 9am and gets 15 back by 7pm.
+> Its net flow is 0, so it looks fine. But its swing is 15, which is more than 11, so it needed a truck.
 
-Supporting metrics:
+## 3. Results (June to August 2026, 2,499,792 rides)
 
-| ID | Metric | Decision it supports |
-|---|---|---|
-| M2 | Minimum bike moves per day (lower bound) | Truck and valet capacity to budget |
-| M3 | Top-50 stations' share of required moves | Can fixed routes replace ad-hoc dispatch? |
-| M4 | Chronic imbalance stations (≥ 50% of days) | Dock expansion or corral candidates |
-| M5 | Dock-attributed ride coverage | How much demand the KPI can see (trust) |
+| Metric | Value | What it tells ops |
+|:-|:-|:-|
+| **M1 (KPI)** Station-days that needed a truck | **1.64%** (stable: 1.49%, 1.78%, 1.66%) | How often the system fails on its own |
+| **M2** Minimum bikes to move per day | **115** (weekends 153, weekdays 100) | Truck capacity to budget (a floor) |
+| **M3** Share of that work at the top 50 stations | **93%** | A fixed route can cover almost all of it |
+| **M4** Chronic stations (fail on 50% or more of days) | **6** | Candidates for more docks or a valet corral |
+| **M5** Rides we can see at docks (start and end) | **61.7%** | How much of demand the KPI covers |
 
-## 4. Results (Jun–Aug 2026, 2,499,792 rides)
+**What we concluded**
 
-| Metric | Jun | Jul | Aug | **Window** |
-|---|---:|---:|---:|---:|
-| **M1** Rebalance-required station-day rate | 1.49% | 1.78% | 1.66% | **1.64%** |
-| M2 Minimum bike moves per day | 114.7 | 129.4 | 100.2 | **115.0** |
-| M3 Top-50 share of required moves | 97.5% | 94.9% | 92.5% | **93.2%** |
-| M4 Chronic imbalance stations | 7 | 7 | 5 | **6** |
-| M5 Dock-attributed ride coverage | 63.3% | 61.4% | 60.4% | **61.7%** |
+1. The problem is **concentrated**: 50 of 1,144 stations do 93% of the work.
+2. It is mostly **stations filling up**, not running empty. 14 of the top 15 are lakefront
+   leisure spots (North Ave Beach, Theater on the Lake) or Loop offices in the morning.
+3. **Weekends are worse**, driven by the lakefront.
+4. Live station data agrees: the chronic stations were empty or full far more often than others.
 
-Full, regenerated evidence: [`outputs/evidence_report.md`](outputs/evidence_report.md) ·
-truck target list: [`outputs/rebalancing_targets.csv`](outputs/rebalancing_targets.csv)
+**Decision supported:** run a fixed "remove bikes" truck route over the top 50 fill stations,
+weighted to weekends, before buying more general truck capacity.
 
-**What this says**
+Full numbers: [outputs/evidence_report.md](outputs/evidence_report.md) and the truck list
+[outputs/rebalancing_targets.csv](outputs/rebalancing_targets.csv).
 
-1. **The problem is concentrated, so fixed routes work.** 50 of 1,144 docking
-   stations (4%) account for 93% of the required moves.
-2. **It is mostly a *dock-full* problem, not an *empty-station* problem.** 14 of
-   the top 15 stations are *fill* stations: lakefront leisure destinations
-   (North Ave Beach, Theater on the Lake, Montrose Harbor) and Loop commute
-   destinations at 07:00–08:00. Trucks there should **remove** bikes.
-3. **Weekends need more moves** (153/day, against 100/day on weekdays), driven by the lakefront.
-4. **The model is corroborated by live data.** In GBFS snapshots, the stations
-   the model calls chronic were empty or full far more often than other stations
-   (see the report).
-5. **About 38% of rides are invisible to any station-level KPI** (dockless e-bikes).
-   This is reported, not hidden (M5).
+## 4. Sources
 
-**Decision supported:** fund a fixed "bike removal" route covering the top-50
-fill stations, weighted to weekends and the lakefront, before adding general
-truck capacity. Evaluate a valet corral or dock expansion at the 6 chronic
-stations.
+| Source | How we get it | One row is | Why we need it |
+|:-|:-|:-|:-|
+| Divvy trip history | **File:** monthly ZIP/CSV download | one ride | The only place history lives |
+| GBFS station information | **API:** JSON | one station | The only place dock capacity lives |
+| GBFS station status | **API:** JSON, polled every 10 min | one station at one moment | To check the model against reality |
+| DuckDB warehouse | **SQL** | every layer below | All joins and metrics are SQL, so they are traceable |
 
-## 5. Sources
+## 5. Our decisions (and why)
 
-| Source | Mode | Grain | Owner |
-|---|---|---|---|
-| Divvy trip history (`divvy-tripdata` S3 bucket) | **File**: monthly ZIP/CSV | 1 ride | Lyft / Divvy |
-| GBFS `station_information` | **API**: JSON | 1 station (capacity, `short_name`) | Lyft |
-| GBFS `station_status` | **API**: JSON, polled by us | 1 station at a point in time | Lyft |
-| DuckDB warehouse | **SQL** | Every layer below | This project |
+| # | Decision | Why |
+|:-|:-|:-|
+| 1 | Chose station rebalancing as the problem | It is a real operational workflow with a clear owner and action |
+| 2 | Used 3 recent months (Jun to Aug 2026) | Peak season, and enough to show month over month reruns |
+| 3 | Joined trips to GBFS on **`short_name`**, not `station_id` | Trip ids like `CHI00252` only match `short_name`. Verified: 99.4% of dock rides match |
+| 4 | KPI = **swing vs capacity**, not net flow or a fixed threshold | Net flow hides morning emptying. A fixed "10 bikes" rule is unfair to small vs big stations |
+| 5 | KPI covers **docking stations only**; public racks excluded | Racks have no real capacity. Their rides still count in M5, so nothing is hidden |
+| 6 | Called M2 a **lower bound** | No source has truck logs, so we can only prove the minimum moves needed |
+| 7 | Day starts at **4am**, not midnight | 3am to 5am has the lowest demand, and overnight crews reset stations then |
+| 8 | Identify stations by **id, never name** | 17 ids have more than one name (e.g. "North Ave Beach" and "North Avenue Beach") |
+| 9 | Rides under 60s are **flagged and excluded from flow, not deleted** | Divvy says it removes them, but 63,490 remain. Most are instant re-docks |
+| 10 | Assign rides to days by their **own timestamps**, not by file | Monthly files are split by ride *end* time (173 July rides sit in the August file) |
+| 11 | Dropped the **last day** of each run window | Its after midnight rides are in next month's file, so it would look too calm |
+| 12 | Committed GBFS snapshots to git, but not the trip ZIPs | GBFS only returns "now" and can never be fetched again. Trip ZIPs can be, so we commit their checksums |
 
-Join key: trip `station_id` = GBFS **`short_name`** (not GBFS `station_id`).
-Full map, ownership, and gaps: [`docs/01_source_map.md`](docs/01_source_map.md)
+## 6. Data model
 
-## 6. Pipeline
+```mermaid
+erDiagram
+    STATION ||..o{ STATION_EVENT : has
+    RIDE ||..o{ STATION_EVENT : "creates 0 to 2"
+    STATION ||..o{ STATION_DAY : "summarised as"
+    STATION ||..o{ STATUS_SNAPSHOT : "observed as"
+
+    STATION {
+        string station_id "CHI00252 = GBFS short_name"
+        int capacity "docks, from GBFS"
+        string kind "docking_station or public_rack"
+    }
+    RIDE {
+        string ride_id
+        timestamp started_at
+        timestamp ended_at
+        string start_station_id
+        string end_station_id
+    }
+    STATION_EVENT {
+        string type "undock = minus 1, dock = plus 1"
+        timestamp event_time
+    }
+    STATION_DAY {
+        int swing "highest minus lowest running total"
+        bool needs_rebalance "swing > capacity"
+        int excess_moves "swing minus capacity"
+    }
+    STATUS_SNAPSHOT {
+        bool is_empty
+        bool is_full
+    }
+```
+
+**In words:** a ride creates an *undock* event at its start station and a *dock* event at
+its end station. Adding those up in time order gives each station's running balance for the
+day. Comparing the swing to capacity gives the outcome. The truck move itself (the
+intervention) is not in any data, so we infer it. Live snapshots are the observed outcome.
+[More detail](docs/04_data_model.md)
+
+## 7. Pipeline
 
 ```mermaid
 flowchart LR
-    A[ingest<br/>S3 ZIP + GBFS API] --> B[load<br/>raw schema, all VARCHAR]
-    B --> C{validate<br/>BLOCK / REJECT / FLAG}
-    C -- blocking rule fails --> X[stop, exit 2<br/>previous outputs kept]
-    C --> D[model<br/>sql/10..60]
-    D --> E[metrics<br/>M1–M5 + C1]
-    E --> F[publish<br/>outputs/ swapped in atomically]
+    A[Ingest: trip files + GBFS API] ==> B[Load raw into DuckDB]
+    B ==> C{Validate}
+    C == fails ==> X[Stop. Old outputs kept]
+    C ==> D[Build model in SQL]
+    D ==> E[Compute metrics]
+    E ==> F[Publish outputs]
 ```
 
-| Dependability property | How |
-|---|---|
-| **Completeness** | Byte count against Content-Length, a ZIP CRC test, CSV rows against warehouse rows, and no missing day ([02](docs/02_retrieval.md)) |
-| **Raw preserved** | Original ZIPs and CSVs kept locally with a committed sha256 manifest; GBFS responses committed verbatim |
-| **Validation** | 20 rules, each with a business reason; nothing silently fixed ([03](docs/03_validation_rules.md)) |
-| **Rerun-safe** | Downloads skipped when the checksum matches; per-month delete-then-insert load; model rebuilt; identical outputs on rerun (tested) |
-| **Fail closed** | Outputs are staged and swapped only on success; a failure writes `outputs/last_run.json` and `audit.runs`, and exits non-zero |
-| **Logging** | A `run_id` per run, `logs/<run_id>.log`, step timings, and a rule-by-rule log |
-| **Single writer** | A lock file prevents concurrent runs |
-| **Tests** | `pytest`: 11 tests on synthetic data covering the swing logic, each validation outcome, reruns, and failure handling |
+What makes it dependable:
 
-Exit codes: `0` success · `1` infrastructure or code error (safe to retry) ·
-`2` data validation failure (investigate the input; don't just retry).
+* **Proves completeness:** file size matches the server, the ZIP passes a checksum test, CSV rows equal warehouse rows, and no day is missing.
+* **Keeps raw data:** the original files are saved untouched, with a checksum list in git.
+* **Never silently fixes data:** 20 rules. Each one either **stops** the run, **quarantines** the row, or **flags** it. [Rules](docs/03_validation_rules.md)
+* **Safe to rerun:** unchanged files are not downloaded again, and each month is replaced, never duplicated. Two runs give identical output (tested).
+* **Fails safely:** outputs are swapped in only if every step passes. A failure is logged, and the exit code is 1 (system problem) or 2 (bad data).
+* **Logged:** every run has an id, a log file, and a record in `audit.runs`.
+* **Tested:** 11 tests on small fake data.
 
-## 7. Setup and run
+## 8. Known / Unknown / Assumption / Limitation
 
-Requires Python 3.10+ and about 400MB of free disk for three months of raw data.
+| | |
+|:-|:-|
+| **Known** | All 92 days retrieved and reconciled. The KPI is about 1.6% and stable. The top 50 stations are 93% of the work. The problem is mostly dock-full |
+| **Unknown** | Real truck moves (not published). Station capacity back in June. Riders who gave up at an empty station |
+| **Assumption** | The day resets at 4am. Today's capacity applies to Jun to Aug. Timestamps are Chicago time |
+| **Limitation** | M2 is a minimum, not the real count. 38% of rides (dockless e-bikes) are outside the KPI. The live check covers only a few hours in September |
+
+[Full register](docs/05_known_unknowns.md)
+
+## 9. How to run
 
 ```bash
-git clone git@github.com:parthdagia05/divvyRebalancingWithMyIQ.git
-cd divvyRebalancingWithMyIQ
 python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt && pip install -e .
-
-python -m divvy run                              # Jun–Aug 2026 (from config/pipeline.yaml)
-python -m divvy run --months 2026-07 2026-08     # any window
-python -m divvy run --snapshot                   # also take a fresh GBFS snapshot
-python -m divvy snapshot --count 12 --interval 600   # poll station status for 2h
-
-pytest                                            # run the test suite
-jupyter notebook notebooks/walkthrough.ipynb      # guided evidence, with charts
+python -m divvy run      # downloads, validates, models and writes outputs/ (about 15s after download)
+pytest                   # runs the tests
 ```
 
-Monthly operation: add the new month to `config/pipeline.yaml` (or pass `--months`) and
-rerun. Months already downloaded are verified by checksum, not downloaded again.
+To add a new month, edit `months` in [config/pipeline.yaml](config/pipeline.yaml) and run again.
 
-## 8. Repository layout
+## 10. Where to find more
 
-```
-config/pipeline.yaml        months, source URLs, validation thresholds, metric parameters
-src/divvy/
-  ingest_trips.py           retrieval mode 1: S3 ZIP/CSV + completeness + manifest
-  ingest_gbfs.py            retrieval mode 2: GBFS API + freshness/consistency + snapshots
-  load.py                   raw → DuckDB, schema check, row reconciliation
-  validate.py               staging + BLOCK/REJECT/FLAG rules → audit.validation_results
-  model.py                  runs sql/*.sql + model invariants
-  metrics.py                M1–M5, target list, GBFS corroboration
-  report.py                 outputs/evidence_report.md
-  pipeline.py               orchestration, lock, fail-closed publish, CLI
-sql/                        the workflow model: station, ride, station event, station-hour, station-day, status obs
-docs/                       01 source map · 02 retrieval · 03 validation · 04 data model · 05 known/unknowns · 06 demo
-data/raw/trips/manifest.json    checksums of every raw input (archives themselves are gitignored)
-data/snapshots/gbfs/        verbatim GBFS responses (cannot be re-fetched, so they are committed)
-outputs/                    evidence from the latest successful run
-notebooks/walkthrough.ipynb explanation layer over the warehouse
-tests/                      synthetic-data tests
-```
-
-## 9. Known / Unknown / Assumption / Limitation (summary)
-
-| | Most important items ([full register](docs/05_known_unknowns.md)) |
-|---|---|
-| **Known** | Retrieval is complete (92 of 92 days, every row reconciled). M1 is about 1.6% and stable. The top 50 stations are 93% of the work. The problem is mostly dock-full |
-| **Unknown** | Actual truck and valet moves (not published). Historical capacity. Riders turned away at empty or full stations |
-| **Assumption** | The day resets at 04:00. Current GBFS capacity applies to Jun–Aug. Timestamps are Chicago local time |
-| **Limitation** | M2 is a **lower bound**. About 38% of rides are dockless and out of scope. GBFS corroboration comes from a few hours of polling in September, so it is directional only |
-
-## 10. The FDE judgement call
-
-The client's real question is about **interventions** (truck moves), but
-interventions are not in any source. Rather than invent a proxy, we defined a
-KPI that *proves* an intervention was required (swing > capacity) and states
-plainly that it is a lower bound. We also scoped it to the stations where
-capacity is meaningful, and kept the 38% we can't see as a first-class metric
-rather than quietly dropping it. Demo walkthrough: [`docs/06_demo_script.md`](docs/06_demo_script.md)
+| File | What is in it |
+|:-|:-|
+| [docs/01_source_map.md](docs/01_source_map.md) | Business questions mapped to sources, owners, gaps |
+| [docs/02_retrieval.md](docs/02_retrieval.md) | How we prove each download is complete |
+| [docs/03_validation_rules.md](docs/03_validation_rules.md) | Data profile and all 20 rules with results |
+| [docs/04_data_model.md](docs/04_data_model.md) | Workflow diagram, full data model, metric formulas |
+| [docs/05_known_unknowns.md](docs/05_known_unknowns.md) | Full Known / Unknown / Assumption / Limitation list |
+| [notebooks/walkthrough.ipynb](notebooks/walkthrough.ipynb) | Step by step evidence with charts |
+| [src/divvy/](src/divvy/) and [sql/](sql/) | The pipeline code and model SQL |
