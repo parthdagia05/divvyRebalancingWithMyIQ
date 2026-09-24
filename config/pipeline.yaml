@@ -1,0 +1,26 @@
+# Single source of truth for what a pipeline run processes.
+# Change `months` and rerun; everything downstream is rebuilt per month.
+
+months: ["2026-06", "2026-07", "2026-08"]
+
+sources:
+  trips_url_template: "https://divvy-tripdata.s3.amazonaws.com/{yyyymm}-divvy-tripdata.zip"
+  gbfs_discovery_url: "https://gbfs.lyft.com/gbfs/2.3/chi/gbfs.json"
+  gbfs_language: "en"
+  gbfs_feeds: ["system_information", "station_information", "station_status"]
+
+paths:
+  raw_trips: "data/raw/trips"
+  gbfs_snapshots: "data/snapshots/gbfs"
+  warehouse: "warehouse/divvy.duckdb"
+  outputs: "outputs"
+  logs: "logs"
+
+http:
+  timeout_seconds: 120
+  max_retries: 4
+  backoff_seconds: 5
+
+gbfs:
+  # A feed older than this is treated as stale and the snapshot is rejected.
+  max_feed_age_seconds: 900
