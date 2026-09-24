@@ -24,3 +24,17 @@ http:
 gbfs:
   # A feed older than this is treated as stale and the snapshot is rejected.
   max_feed_age_seconds: 900
+
+validation:
+  # Chicago service area. Divvy reaches Evanston (N) and the far South Side.
+  bbox: {lat_min: 41.60, lat_max: 42.10, lng_min: -87.95, lng_max: -87.50}
+  allowed_rideable_types: ["classic_bike", "electric_bike"]
+  allowed_member_casual: ["member", "casual"]
+  # Station names that are operator facilities, not customer demand.
+  staff_station_pattern: "(?i)(warehouse|staff|test|repair|bike-checking)"
+  # Blocking thresholds: exceeding these stops the run before any metric is written.
+  max_pct_unparseable_timestamps: 0.1
+  max_pct_duplicate_ride_ids: 1.0
+  max_pct_file_month_mismatch: 1.0
+  min_days_with_rides_pct: 100.0
+  min_gbfs_docking_join_pct: 90.0
